@@ -4,7 +4,10 @@ This is the end-of-course project for the JHU course on [Getting and Cleaning Da
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for working with the data set.
+### Background
+
+One of the most exciting areas in all of data science right now is wearable computing. Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. For more information, see the artcile [Big Data, Activity Tracking, And The Battle For The
+world's Top Sports Brand](big_data_sports_article.pdf) written by David Stern.
 
 ### Prerequisites
 
@@ -26,4 +29,10 @@ The project can be run using the `run_analysis.R` script in the RStudio console 
 > source("run_analysis.R")
 ```
 
-Realistically someone wanting to study the process will `Run` a few line of the script at a time in RStudio. But remember that the script is sequential and must be run that way to successfully execute.
+Realistically someone wanting to study the process will `Run` a few line of the script at a time in RStudio. But remember that the script is sequential and each line of execution must be run in order.
+
+## Data Set
+
+The required raw data set represents data collected from the accelerometers from  Samsung Galaxy S smartphones. The original data was obtained from the UCI Machine Learning Repository and contains a great discussion on [Human Activity Recognition Using Smartphones Data Set](http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) if you're interested in the subject.
+
+The project uses an extracted version of this data set which is downloaded by the `run_analysis.R` script. Due to its size (59.7 mb), the data set is *not* included in the GitHub repository.
