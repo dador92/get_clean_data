@@ -91,3 +91,7 @@ Once both study groups have been loaded and assembled, they are combined into a 
 ## Making the Data Tidy
 
 This section explains the fundamental steps taken by the `run_analysis.R` script to tidy up the raw data set.
+
+### Tidy Data Set Defined
+
+The tidy data set is defined in the [**Code Book**](./code_book.md). The operations performed on the raw data set (as described below) will transform it into the tidy data set that the Code Book describes. The explanation or motivation for each step in the transformation is explain with that transformation's description.
