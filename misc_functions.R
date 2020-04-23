@@ -49,3 +49,16 @@ loadAssembleSourceData <- function(studyGroup) {
     # 3. return the assembled raw data set
     assembled
 }
+
+
+## computes and returns the average of a vector of standard deviations
+## designed to be used from within in a plydr summarize() call
+averageOfStd <- function(dat) {
+    n = length(dat)
+    sumVar = 0.0
+    for (aStd in dat) {
+        aVar <- aStd^2            # square each standard deviation to get its corresponding variance
+        sumVar <- sumVar + aVar   # sum up the variances
+    }
+    avgStd <- sqrt(sumVar / n)    # divide the sum of the variances by their count, then take the square root
+}

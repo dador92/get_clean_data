@@ -1,4 +1,4 @@
-# get_clean_data
+# `get_clean_data` Project
 
 This is the end-of-course project for the JHU course on [Getting and Cleaning Data](https://www.coursera.org/learn/data-cleaning/) which is hosted on Coursera.
 
@@ -50,7 +50,7 @@ The raw data set consists of many files located in a nested directory structure.
   + 9 volunteers in the test study group `{ 2, 4, 9, 10, 12, 13, 18, 20, 24 }`
   + 21 volunteers in the train study group `{ 1, 3, 5, 6, 7, 8, 11, 14, 15, 16, 17, 19, 21, 22, 23, 25, 26, 27, 28, 29, 30 }`
  * Using an accelerometer and gyroscope attached to each subject, the researchers took measurements from these devices while the volunteers engaged in 6 different activities, namely ...
-   1. Walking
+   1. Walking (presumably horizontally)
    2. Walking Upstairs
    3. Walking Downstairs
    4. Sitting
@@ -86,12 +86,115 @@ The initial assembly of the raw data from 4 separate files in each study group i
   <img  src="./images/raw_layout_test.png"></img>
 </div>
 
-Once both study groups have been loaded and assembled, they are combined into a single data table for tidying (titled `rawAll` in the script).
+Once both study groups have been loaded and assembled, they are combined into a single data table for tidying (titled `rawAll` in the script). This data table contains 564 columns and 10,299 rows.
 
 ## Making the Data Tidy
 
-This section explains the fundamental steps taken by the `run_analysis.R` script to tidy up the raw data set.
+This section explains the fundamental steps taken by the `run_analysis.R` script to tidy up the raw data set and create data that is ready for analysis (within the bounds of the project rubric).
 
 ### Tidy Data Set Defined
 
-The tidy data set is defined in the [**Code Book**](./code_book.md). The operations performed on the raw data set (as described below) will transform it into the tidy data set that the Code Book describes. The explanation or motivation for each step in the transformation is explain with that transformation's description.
+The tidy data set for this project is defined in the [**Code Book**](./code_book.md). The operations performed on the raw data set (as described below) will transform it into the tidy data set that the Code Book describes. The explanation or motivation for each step in the transformation is explained with that transformation's description.
+
+Canonically speaking, a tidy data set has the following attributes:
+
+1. Each measured variable has its own column
+2. Each unique observation has its own row
+3. Each "kind" of variable has its own table (typically represented in R as a `data.table` structure)
+4. If a tidy data set spans multiple tables, then each table should have at least one column (typically an ID of some sort) that links it into one or more other tables to facilitate integration of the data into a cohesive whole
+
+A tidy data set has a few other *important* features:
+
+* The top row of the data.table contains variable names
+* The variable names can be read and understood
+
+
+### General Explanation of the Tidying Steps
+
+#### 1. Drop Unwanted Columns/Variables
+
+**Motivation**: slim out a large data set before more expensive transformational functions are applied.
+
+(Note: The dicussion forum for the course contains many comments about whether an early/initial narrowing of the data set is advisable. Most opted for the narrowing.)
+
+Most of the columns can be deleted because (according to the rubric) only mean and standard deviation values are of interest. In particular, columns containing the following are kept:
+
+* `study`: descriptive identifier
+* `vols`: descriptive identifier
+* `acts`: descriptive identifier
+* `*mean()`: desired measurement
+* `*std()`: desired measurement
+
+In most cases it was easy to determine which variables/features to keep, but 13 contained the suffix `meanFreq()` and thus warranted additional consideration. The description of these "features" in the `features_info.txt` file is as follows:
+
+> meanFreq(): Weighted average of the frequency components to obtain a mean frequency
+
+Based on this description, I am excluding these variables/features, which leaves a total of 3 descriptive variables and 66 measurement variables prior to the next step in the tidying process.
+
+The effect of these deletions is to reduce the size of the data set from 44.3 MB down to 5.3 MB. The reduced data set is stored in `dataS1` which has 69 columns and 10,299 rows.
+
+#### 2. Average the Measurements for the Observations
+
+**Motivation**: compress the observations/experiments down to a single set of values for each combination of study, volunteer and activity.
+
+The raw data set contains approximately 50 observations/experiments for each combination of study, volunteer and the activities 2 through 6 (Walking Upstairs, Walking Downstairs, Sitting, Standing, Laying), while there are approximately 100 observations/experiments for activity 1 (Walking). Averaging the means and standard deviations yields a cleaner look at the data.
+
+Theoretically, the same volunteer from a single study engaging in the same activity should not produce appreciable different results barring extenuating circumstances. Since the data set does not provide any information on extenuating circumstances to facilitate such an analysis, averaging the means and standard deviations by study, volunteer and activity seems useful and practical.
+
+The average of the means is a simple average calculation. But averaging the standard deviations requires a more extensive calculation. First, you must square all of the standard deviations in order to convert them back to variances. Second, calculate a simple average of the variances. Third and finally, take the square root of the average variance.
+
+\begin{equation}std(v,a) = \sqrt{\frac{\sum_{i=1}^{n} {std(v,a_i)}^2}{n}} \end{equation}
+
+In the R code, this is implemented in a funtion titled `averageOfStd()` which is defined in the `misc_functions.R` script file.
+
+This coincidentally fixes the problem in the raw data where the standard deviation is frequently recorded as a negative number. In the tidy data, all of the standard deviations are now positive. With a standard deviation, the amount of the deviation is significant; whether you're considering the variance on the positive or negative side of the mean is not significant. (Note: see page 2 of [MIT lecture notes on Variance of Discrete Random Variables](https://ocw.mit.edu/courses/mathematics/18-05-introduction-to-probability-and-statistics-spring-2014/readings/MIT18_05S14_Reading5a.pdf) for an explaination of why positive values are used for standard deviations.)
+
+The effect of these summaries is to reduce the size of the data set from 5.3 MB down to 105.6 *KB*. The reduced data set is stored in `dataS2` which has the same 69 columns but now only 180 rows.
+
+
+#### 3. Convert Variables to Observations
+
+**Motivation**: convert mis-categorized variables/features into observations.
+
+The studies (test and train) only contain two true quantifiable variables of interest (as defined by the project rubric): `mean()` and `std()`. Most of the items listed as variables/features should actually be part of the observation identification set which should be made up of the following four identifiers:
+
+1. study
+2. volunteer (a non-descript integer value)
+3. activity
+4. measurement
+
+This step implements that conversion using R's `melt()` functionality.
+
+As part of the conversion, the names of the measures are truncated to eliminate `mean()` and `std()` since those are left as the remaining column headers of the quantifiable variables.
+
+What remains is a data set with the following 6 column labels:
+
+* `study`
+* `vols`
+* `acts`
+* `measure`
+* `mean()`
+* `std()`
+
+
+move the columns to rows
+- leave mean and std as column variables
+- put 33 measures in a descriptive column called measure
+- need to filter out "-mean()" and "-std()" portions of the measure column
+
+
+and rows at ...
+30 vols * 6 acts * 33 measures = 5,940 rows
+
+
+#### 4. Clean Up Labels, Add Indexes
+clean up column labels a little
+
+
+#### Possible Tidying Steps Not Taken
+
+First, the variable/feature names for the measurements were not cleaned up. Lacking any expertise in the subject matter, I did not feel comfortable converting any of these technical labels without the running the risk degrading their meaning. During Step 3, the qualifiers `mean()` and `std()` were dropped since these reamined as the column/variable/features labels of the measurement data.
+
+The names of the decriptive variables were updated from their working titles.
+
+
