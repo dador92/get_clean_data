@@ -14,6 +14,7 @@ dataRoot <- "./UCI\ HAR\ Dataset"
 ## since the layout for both study groups (test and train) are the same,
 ## consolidtaing the load and assembly into a single funtion simplifies
 ## the scripting
+## studyGroup is the name of the study group being loaded (test or train)
 loadAssembleSourceData <- function(studyGroup) {
     
     # 1. load the source data
@@ -47,6 +48,7 @@ loadAssembleSourceData <- function(studyGroup) {
 
 ## computes and returns the average of a vector of standard deviations
 ## designed to be used from within in a plydr summarize() call
+## dat is a vector of standard deviations
 averageOfStd <- function(dat) {
     n = length(dat)
     sumVar = 0.0
@@ -58,6 +60,9 @@ averageOfStd <- function(dat) {
 }
 
 
+## melts a data table by moving observations from columns to row
+## dat is a data table
+## type is the measurement being moved to a row (either mean or std)
 meltData <- function(dat, type) {
     # clean up the column names first before replicating them across lots of rows
     colNames <- colnames(dat)

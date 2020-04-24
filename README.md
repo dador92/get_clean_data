@@ -206,7 +206,7 @@ b. The working titles for the columns are replaced by more readable labels, spec
    - `std.dev`
 c. The data table is sorted (arranged) using `volunteer`, `study`, `activity`, and `measure` in that order.
 
-The tidy data set (`data.s4`) takes up 213.8 KB of memory. The dimensions haven't changed since the last step.
+The tidy data set (`data.s4`) takes up 213.8 KB of memory. The dimensions haven't changed from the previous step.
 
 Finally the data table is saved to a CSV file named `dataTidy.csv`. Note that if this file already exists, it gets overwritten. The file takes up 431 KB on disk.
 
