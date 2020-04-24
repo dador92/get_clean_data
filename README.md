@@ -142,13 +142,17 @@ The raw data set contains approximately 50 observations/experiments for each com
 Theoretically, the same volunteer from a single study engaging in the same activity should not produce appreciable different results barring extenuating circumstances. Since the data set does not provide any information on extenuating circumstances to facilitate such an analysis, averaging the means and standard deviations by study, volunteer and activity seems useful and practical.
 
 The average of the means is a simple average calculation. But averaging the standard deviations requires a more extensive calculation. First, you must square all of the standard deviations in order to convert them back to variances. Second, calculate a simple average of the variances. Third and finally, take the square root of the average variance.
+
+\begin{equation}std(s,v,a) = \sqrt{\frac{\sum_{i=1}^{n} {std(s,v,a)}_i^2}{n}} \end{equation}
 <!--
-\begin{equation}std(v,a) = \sqrt{\frac{\sum_{i=1}^{n} {std(v,a_i)}^2}{n}} \end{equation}
 # sadly the above equation needs to be inserted as a graphic because GitHub won't process the formula
--->
+
 <div align="center">
   <img  src="./images/avg_std_eq.png"></img>
 </div>
+-->
+
+... where $std(s,v,a)$ is the set of all standard deviations $std(s,v,a)_i$ from observations of a particular measure for an identifying combination of a study, volunteer, and activity.
 
 In the R code, this is implemented in a funtion titled `averageOfStd()` which is defined in the `misc_functions.R` script file.
 
