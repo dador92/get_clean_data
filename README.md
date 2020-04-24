@@ -21,7 +21,7 @@ While earlier versions of these technologies may work, the latest versions are r
 
 ### Getting a Copy of the Project to Work With
 
-Please clone the project into your own GitHub account and then access through RStudio using the `File > New Project... > Version Control > Git` command.
+Please clone the project into your own GitHub account and then access from that clone in your GitHub account via RStudio using the `File > New Project... > Version Control > Git` command.
 
 
 
@@ -29,10 +29,12 @@ Please clone the project into your own GitHub account and then access through RS
 
 ### Master Script
 
-The project can be run using the `run_analysis.R` script in the RStudio console as follows:
+The project can be run using the [`run_analysis.R`](./run_analysis.R) script in the RStudio console as follows:
 ```
 > source("run_analysis.R")
 ```
+
+Utility functions are provided in the script file [`misc_functions.R`](./misc_functions.R) which are referenced as needed from the `run_analysis.R` script.
 
 Realistically someone wanting to study the process will run a few line of the script at a time in RStudio. But remember that the script is sequential and each line of execution must be run in order.
 
@@ -80,17 +82,17 @@ As a general observation, the data files in the raw data set are all fixed width
 
 #### Initial Assembly of Raw Data
 
-The initial assembly of the raw data from 4 separate files in each study group is done first to get a cohesive data set. This assembly is done for both the test study group as well as the train study group. Below is a graphic of the initial assembly of the raw data files for the test study group in order to get an initial cohesive data set from the test study group.
+The initial assembly of the raw data in each study group from 4 separate files is done first to get a cohesive data set. This assembly is done for both the test study group as well as the train study group. Below is a graphic of the initial assembly of the raw data files for the test study group in order to get its initial cohesive data set.
 
 <div align="center">
   <img  src="./images/raw_layout_test.png"></img>
 </div>
 
-Once both study groups have been loaded and assembled, they are combined into a single data table for tidying (titled `data.raw.all` in the script). This data table contains 564 columns and 10,299 rows.
+Once both study groups have been loaded and assembled, they are combined into a single data table for tidying (titled `data.raw.all` in the script). This data table contains 564 columns and 10,299 rows and consumes 44.3 MB of memory.
 
 ## Making the Data Tidy
 
-This section explains the fundamental steps taken by the `run_analysis.R` script to tidy up the raw data set and create data that is ready for analysis (within the bounds of the project rubric).
+This section explains the fundamental steps taken by the `run_analysis.R` script to tidy up the raw data set and create data that is ready for analysis (pursuant to the requirements of the project rubric).
 
 ### Tidy Data Set Defined
 
@@ -122,8 +124,8 @@ Most of the columns can be deleted because (according to the rubric) only mean a
 * `study`: descriptive identifier
 * `vols`: descriptive identifier
 * `acts`: descriptive identifier
-* `*mean()`: desired measurement
-* `*std()`: desired measurement
+* `{measurement}-mean()`: desired measurement
+* `{measurement}-std()`: desired measurement
 
 In most cases it was easy to determine which variables/features to keep, but 13 contained the suffix `meanFreq()` and thus warranted additional consideration. The description of these "features" in the `features_info.txt` file is as follows:
 
@@ -131,7 +133,7 @@ In most cases it was easy to determine which variables/features to keep, but 13 
 
 Based on this description, I am excluding these variables/features, which leaves a total of 3 descriptive variables and 66 measurement variables prior to the next step in the tidying process.
 
-The effect of these deletions is to reduce the size of the data set from 44.3 MB down to 5.3 MB. The reduced data set is stored in `data.s1` which has 69 columns and 10,299 rows.
+The effect of these deletions is to reduce the size of the data set from 44.3 MB down to 5.3 MB. The reduced data set is stored in `data.s1` and has 69 columns and 10,299 rows.
 
 #### Step 2. Average the Measurements for the Observations
 
@@ -176,7 +178,7 @@ The studies (test and train) only contain two true quantifiable variables of int
 
 This step implements that conversion using R's `melt()` functionality. Carrying forward the separated subsets of data from the previous step, it's straightforward to melt them separately and then merge them in preparation for the final step (discussed in the next section).
 
-As part of the conversion, the names of the measures are truncated to eliminate `-mean()` and `-std()` since those are converted to column labels for the two remaining quantifiable variables. So the labels for the measurment in each of the subsets of data are now identical and can be added to the list of merge identifiers.
+As part of the conversion, the names of the measures are truncated to eliminate `-mean()` and `-std()` since those are converted to column labels for the two remaining quantifiable variables. So the measurment labels in both subsets of data are now identical and can be included in the list of merge identifiers.
 
 What remains is a merged data set with the following 6 column labels:
 

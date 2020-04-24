@@ -24,9 +24,10 @@ data.raw.test <- loadAssembleSourceData("test")    # function defined in misc_fu
 data.raw.train <- loadAssembleSourceData("train")  # function defined in misc_functions.R file
 data.raw.all <<- rbindlist(list(data.raw.test, data.raw.train))
 
-rm(data.raw.test, data.raw.train)
-
+dim(data.raw.all)
 object.size(data.raw.all)
+
+rm(data.raw.test, data.raw.train)
 
 
 # 3. tidy up the raw data ----------
@@ -66,6 +67,7 @@ rm(data.grp.sva)      # keeping dataGrpMean, dataGrpStd for reshaping step
 
 #    c. Step 3 -> melt the data table so that the 33 measurements are now individual observations
 #       with two actual variables: mean and std
+
 data.melt.mean <- meltData(data.grp.mean, "mean")  # function defined in misc_functions.R file
 data.melt.std <- meltData(data.grp.std, "std")     # function defined in misc_functions.R file
 data.s3 <<- merge(data.melt.mean, data.melt.std, by=c("study", "vols", "acts", "measure"))

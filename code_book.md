@@ -4,9 +4,9 @@ This document contains the code book for the final project of the Getting and Cl
 
 ## Composition
 
-The data set resides in a single table with 6 columns and 5,490 rows.
+The tidy data set resides in a single table with 6 columns and 5,490 rows.
 
-The data is stored to disk in the CSV file `tidyData.csv`.
+The data gets stored to disk in the CSV file `tidyData.csv`.
 
 ## Columns
 
@@ -15,14 +15,16 @@ The data is stored to disk in the CSV file `tidyData.csv`.
 | **ID** | `volunteer` | integer | 1-30 | data was provided on 30 volunteers identified only by a number |
 | | `study` | string | test, train | volunteers were assigned to one of two study groups |
 | | `activity` | string | (see below) | measurements were taken while volunteers engaged in an activity |
-| | `measurement` | string | (see below) | 33 different measurment were taken on each activity performed by each volunteer |
-| **data** | `mean` | double | unconstrained | several observations were made for each activity undertaken by a volunteer and their mean is included |
-| | `std.dev` | double | unconstrained | several observations were made for each activity undertaken by a volunteer and the standard deviation is included |
+| | `measurement` | string | (see below) | 33 different scientific measurment were taken on each activity performed by each volunteer |
+| **data** | `mean` | double | unconstrained | several observations were made for each activity undertaken by a volunteer and their mean is included (per the project rubric) |
+| | `std.dev` | double | unconstrained | several observations were made for each activity undertaken by a volunteer and the standard deviation is included (per the project rubric) |
 
 
 ### Range of Values
 
 #### activity
+
+Measurements were taken on vouunteers as they engaged in the following 6 activities.
 
 1. Walking
 2. Walking Upstairs
@@ -33,6 +35,11 @@ The data is stored to disk in the CSV file `tidyData.csv`.
 
 #### measurement
 
+The accelerometer and gyroscope measured a significant number of readings. This tidying project makes no attempt to explain what they mean, but the original explanations are provided in the next section.
+
+<table>
+<tr>
+<td>
 1. tBodyAcc-X
 2. tBodyAcc-Y
 3. tBodyAcc-Z
@@ -44,6 +51,8 @@ The data is stored to disk in the CSV file `tidyData.csv`.
 9. tBodyAccJerk-Z
 10. tBodyGyro-X
 11. tBodyGyro-Y
+</td>
+<td>
 12. tBodyGyro-Z
 13. tBodyGyroJerk-X
 14. tBodyGyroJerk-Y
@@ -55,6 +64,8 @@ The data is stored to disk in the CSV file `tidyData.csv`.
 20. tBodyGyroJerkMag
 21. fBodyAcc-X
 22. fBodyAcc-Y
+</td>
+<td>
 23. fBodyAcc-Z
 24. fBodyAccJerk-X
 25. fBodyAccJerk-Y
@@ -66,6 +77,10 @@ The data is stored to disk in the CSV file `tidyData.csv`.
 31. fBodyBodyAccJerkMag
 32. fBodyBodyGyroMag
 33. fBodyBodyGyroJerkMag
+</td>
+</tr>
+</table>
+
 
 ## Background From Source Documents
 
