@@ -152,7 +152,7 @@ The average of the means is a simple average calculation. But averaging the stan
 </div>
 
 
-... where <span style="font-family: serif; font-style: italic; font-size: larger">std(s,v,a)</span> is the set of all standard deviations <span style="font-family: serif; font-style: italic; font-size: larger">std(s,v,a)<sub>i</sub></span> from observations of a particular measure for an identifying combination of a study, volunteer, and activity.
+... where *std(s,v,a)* is the average of the set of all standard deviations *std(s,v,a)<sub>i</sub>* from observations of a particular measure for an identifying combination of a study, volunteer, and activity.
 
 In the R code, this is implemented in a funtion titled `averageOfStd()` which is defined in the `misc_functions.R` script file.
 
@@ -160,8 +160,10 @@ This coincidentally fixes the problem in the raw data where the standard deviati
 
 The effect of these summaries is to reduce the size of the data set from 5.3 MB down to 105.6 *KB*. The reduced data set is stored in `dataS2` which has the same 69 columns but now only 180 rows.
 
+Note: During this step the summarization split the data set between mean() measures and std() measures. These two subsets of the have been merged at the end of this step so that metrics can be taken. But for the next step, the separated subsets of data are needed.
 
-#### 3. Convert Variables to Observations
+
+#### 3. Reshaping by Converting Variables to Observations
 
 **Motivation**: convert mis-categorized variables/features into observations.
 
@@ -172,11 +174,11 @@ The studies (test and train) only contain two true quantifiable variables of int
 3. activity
 4. measurement
 
-This step implements that conversion using R's `melt()` functionality.
+This step implements that conversion using R's `melt()` functionality. Carrying forward the separated subsets of data from the previous step, it's straightforward to melt them separately and then merge them in preparation for the final step (discussed in the next section).
 
-As part of the conversion, the names of the measures are truncated to eliminate `mean()` and `std()` since those are left as the remaining column headers of the quantifiable variables.
+As part of the conversion, the names of the measures are truncated to eliminate `mean()` and `std()` since those are left as the remaining column headers of the quantifiable variables. So the labels for the measurment in each of the subsets of data are now identical and can be added to the list of merge identifiers.
 
-What remains is a data set with the following 6 column labels:
+What remains is a merged data set with the following 6 column labels:
 
 * `study`
 * `vols`

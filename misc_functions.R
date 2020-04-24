@@ -4,6 +4,7 @@
 
 library(readr)
 library(data.table)
+library(stringr)
 
 
 dataRoot <- "./UCI\ HAR\ Dataset"
@@ -61,4 +62,18 @@ averageOfStd <- function(dat) {
         sumVar <- sumVar + aVar   # sum up the variances
     }
     avgStd <- sqrt(sumVar / n)    # divide the sum of the variances by their count, then take the square root
+}
+
+
+meltData <- function(dat, type) {
+    # clean up the column names first before replicating them across lots of rows
+    colNames <- colnames(dat)
+    setnames(dat, str_replace_all(colNames, paste("-", type, "\\(\\)", sep=""), ""))
+    
+    # melt the data table
+    datMelt <- melt(
+        as.data.table(ungroup(dat)),   # odd casting required when ungrouping
+        id.vars = c("study", "vols", "acts"),
+        variable.name = "measure", 
+        value.name = type)
 }
