@@ -20,13 +20,13 @@ unzip("Dataset.zip", exdir = "./")
 
 
 # 2. load, assemble, and combine the source data sets ------------
-dataRawTest <- loadAssembleSourceData("test")    # function defined in misc_functions.R file
-dataRawTrain <- loadAssembleSourceData("train")  # function defined in misc_functions.R file
-dataRawAll <- rbindlist(list(dataRawTest, dataRawTrain))
+data.raw.test <- loadAssembleSourceData("test")    # function defined in misc_functions.R file
+data.raw.train <- loadAssembleSourceData("train")  # function defined in misc_functions.R file
+data.raw.all <<- rbindlist(list(data.raw.test, data.raw.train))
 
-rm(dataRawTest, dataRawTrain)
+rm(data.raw.test, data.raw.train)
 
-object.size(dataRawAll)
+object.size(data.raw.all)
 
 
 # 3. tidy up the raw data ----------
@@ -34,57 +34,64 @@ object.size(dataRawAll)
 #    a. Step 1 ->keep only the variables (features) that measure mean() or std()
 keepVars <- list("study", "vols", "acts", "mean\\(\\)", "std\\(\\)")
 keepPattern <- paste(keepVars, collapse="|")
-rawColNames <- colnames(dataRawAll)
+rawColNames <- colnames(data.raw.all)
 keepNames <- rawColNames[grep(keepPattern, rawColNames)]
-dataS1 <- dataRawAll[, keepNames, with = FALSE]
+data.s1 <<- data.raw.all[, keepNames, with = FALSE]
 
-dim(dataS1)
-object.size(dataS1)
+dim(data.s1)
+object.size(data.s1)
 
-rm(keepVars, keepPattern, keepNames)
+rm(rawColNames, keepVars, keepPattern, keepNames)
 
 
 #    b. Step 2 ->average the measurements of the observations for each study/volunteer/activity combination
 
 # group the data by study/volunteer/activity
-dataGrpSVA <- dataS1 %>% group_by(study, vols, acts)
+data.grp.sva <- data.s1 %>% group_by(study, vols, acts)
 
 # get the mean of the mean variables
-dataGrpMean <- dataGrpSVA %>% summarize_at(.vars = colnames(.)[grep("mean\\(\\)", colnames(dataGrpSVA))], mean)
+data.grp.mean <- data.grp.sva %>% summarize_at(.vars = colnames(.)[grep("mean\\(\\)", colnames(data.grp.sva))], mean)
 
 # compute the average standard deviation (note: averageOfStd() defined in misc_functions.R)
-dataGrpStd <- dataGrpSVA %>% summarize_at(.vars = colnames(.)[grep("std\\(\\)", colnames(dataGrpSVA))], averageOfStd)
+data.grp.std <- data.grp.sva %>% summarize_at(.vars = colnames(.)[grep("std\\(\\)", colnames(data.grp.sva))], averageOfStd)
 
 # merge the data back together
-dataS2 <- merge(dataGrpMean, dataGrpStd, by=c("study", "vols", "acts"))
+data.s2 <<- merge(data.grp.mean, data.grp.std, by=c("study", "vols", "acts"))
 
-object.size(dataS2) # 105.6 KB
-dim(dataS2)         # 6 activities and 30 subjects remaining, so 6 * 30 = 180 records/rows
+object.size(data.s2) # 105.6 KB
+dim(data.s2)         # 6 activities and 30 subjects remaining, so 6 * 30 = 180 records/rows
 
-rm(dataGrpSVA)      # keeping dataGrpMean, dataGrpStd for reshaping step
+rm(data.grp.sva)      # keeping dataGrpMean, dataGrpStd for reshaping step
 
 
 #    c. Step 3 -> melt the data table so that the 33 measurements are now individual observations
 #       with two actual variables: mean and std
-dataMeltMean <- meltData(dataGrpMean, "mean")
-dataMeltStd <- meltData(dataGrpStd, "std")
-dataS3 <- merge(dataMeltMean, dataMeltStd, by=c("study", "vols", "acts", "measure"))
+data.melt.mean <- meltData(data.grp.mean, "mean")
+data.melt.std <- meltData(data.grp.std, "std")
+data.s3 <<- merge(data.melt.mean, data.melt.std, by=c("study", "vols", "acts", "measure"))
 
-object.size(dataS3) # 188.4 KB (the data set got bigger)
-dim(dataS3)         # 180 rows flattened for 33 measure pairs, so 180 * 333 = 5,940 records/rows
+object.size(data.s3) # 188.4 KB (the data set got bigger)
+dim(data.s3)         # 180 rows flattened for 33 measure pairs, so 180 * 333 = 5,940 records/rows
 
-rm(dataGrpMean, dataMeltMean, dataGrpStd, dataMeltStd)
+rm(data.grp.mean, data.melt.mean, data.grp.std, data.melt.std)
 
 
 #    d. Step 4 -> clean up the labels, write out the file
 
-# retitle the columns to more readable terms
-niceColNames <- c("study", "volunteer", "activity", "measure", "mean", "std.dev")
-setnames(dataS3, niceColNames)
+# set up some helper vectors
+labelActivities = c("Walking", "Walking Upstairs", "Walking Downstairs", "Sitting", "Standing", "Laying")
+niceColNames <- c("volunteer", "study", "activity", "measure", "mean", "std.dev")
 
-# swap out the activity codes for actual activity names
+# one big pipe
+data.s4 <<- data.s3 %>% 
+            mutate(activity = labelActivities[acts]) %>%           # swap out the activity codes for actual activity names
+            select(vols, study, activity, measure, mean, std) %>%  # sequence the columns
+            setnames(niceColNames) %>%                             # retitle the columns to more readable terms
+            arrange(volunteer, study, activity, measure)           # sort the rows
 
+# save the tidy data
+write_csv(data.s4, "./tidyData.csv", append=FALSE)
 
-# add indexes
+object.size(data.s4)
 
-#Definitions: Variable is a synonym for feature, attribute, or column. Record is a synonym for instance, tuple, or row.
+rm(labelActivities, niceColNames)

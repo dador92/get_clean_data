@@ -34,7 +34,7 @@ The project can be run using the `run_analysis.R` script in the RStudio console 
 > source("run_analysis.R")
 ```
 
-Realistically someone wanting to study the process will `Run` a few line of the script at a time in RStudio. But remember that the script is sequential and each line of execution must be run in order.
+Realistically someone wanting to study the process will run a few line of the script at a time in RStudio. But remember that the script is sequential and each line of execution must be run in order.
 
 ### Raw Data Set
 
@@ -86,7 +86,7 @@ The initial assembly of the raw data from 4 separate files in each study group i
   <img  src="./images/raw_layout_test.png"></img>
 </div>
 
-Once both study groups have been loaded and assembled, they are combined into a single data table for tidying (titled `rawAll` in the script). This data table contains 564 columns and 10,299 rows.
+Once both study groups have been loaded and assembled, they are combined into a single data table for tidying (titled `data.raw.all` in the script). This data table contains 564 columns and 10,299 rows.
 
 ## Making the Data Tidy
 
@@ -111,7 +111,7 @@ A tidy data set has a few other *important* features:
 
 ### General Explanation of the Tidying Steps
 
-#### 1. Drop Unwanted Columns/Variables
+#### Step 1. Drop Unwanted Columns/Variables
 
 **Motivation**: slim out a large data set before more expensive transformational functions are applied.
 
@@ -131,9 +131,9 @@ In most cases it was easy to determine which variables/features to keep, but 13 
 
 Based on this description, I am excluding these variables/features, which leaves a total of 3 descriptive variables and 66 measurement variables prior to the next step in the tidying process.
 
-The effect of these deletions is to reduce the size of the data set from 44.3 MB down to 5.3 MB. The reduced data set is stored in `dataS1` which has 69 columns and 10,299 rows.
+The effect of these deletions is to reduce the size of the data set from 44.3 MB down to 5.3 MB. The reduced data set is stored in `data.s1` which has 69 columns and 10,299 rows.
 
-#### 2. Average the Measurements for the Observations
+#### Step 2. Average the Measurements for the Observations
 
 **Motivation**: compress the observations/experiments down to a single set of values for each combination of study, volunteer and activity.
 
@@ -158,12 +158,12 @@ In the R code, this is implemented in a funtion titled `averageOfStd()` which is
 
 This coincidentally fixes the problem in the raw data where the standard deviation is frequently recorded as a negative number. In the tidy data, all of the standard deviations are now positive. With a standard deviation, the amount of the deviation is significant; whether you're considering the variance on the positive or negative side of the mean is not significant. (Note: see page 2 of [MIT lecture notes on Variance of Discrete Random Variables](https://ocw.mit.edu/courses/mathematics/18-05-introduction-to-probability-and-statistics-spring-2014/readings/MIT18_05S14_Reading5a.pdf) for an explaination of why positive values are used for standard deviations.)
 
-The effect of these summaries is to reduce the size of the data set from 5.3 MB down to 105.6 *KB*. The reduced data set is stored in `dataS2` which has the same 69 columns but now only 180 rows.
+The effect of these summaries is to reduce the size of the data set from 5.3 MB down to 105.6 *KB*. The reduced data set is stored in `data.s2` which has the same 69 columns but now only 180 rows.
 
 Note: During this step the summarization split the data set between mean() measures and std() measures. These two subsets of the have been merged at the end of this step so that metrics can be taken. But for the next step, the separated subsets of data are needed.
 
 
-#### 3. Reshaping by Converting Variables to Observations
+#### Step 3. Reshaping by Converting Variables to Observations
 
 **Motivation**: convert mis-categorized variables/features into observations.
 
@@ -176,7 +176,7 @@ The studies (test and train) only contain two true quantifiable variables of int
 
 This step implements that conversion using R's `melt()` functionality. Carrying forward the separated subsets of data from the previous step, it's straightforward to melt them separately and then merge them in preparation for the final step (discussed in the next section).
 
-As part of the conversion, the names of the measures are truncated to eliminate `mean()` and `std()` since those are left as the remaining column headers of the quantifiable variables. So the labels for the measurment in each of the subsets of data are now identical and can be added to the list of merge identifiers.
+As part of the conversion, the names of the measures are truncated to eliminate `-mean()` and `-std()` since those are converted to column labels for the two remaining quantifiable variables. So the labels for the measurment in each of the subsets of data are now identical and can be added to the list of merge identifiers.
 
 What remains is a merged data set with the following 6 column labels:
 
@@ -184,22 +184,31 @@ What remains is a merged data set with the following 6 column labels:
 * `vols`
 * `acts`
 * `measure`
-* `mean()`
-* `std()`
+* `mean`
+* `std`
+
+The melting actually increases the size of the data set (`data.s3`) up to 188.4 KB. In terms of dimensions, the columns shrink down to the 6 enumerated in the list above, while the rows/observations increase to 5,940 (= 30 volunteers * 6 activities * 33 measures).
 
 
-move the columns to rows
-- leave mean and std as column variables
-- put 33 measures in a descriptive column called measure
-- need to filter out "-mean()" and "-std()" portions of the measure column
+#### Step 4. Clean Up Labels, Sort, Save
 
+**Motivation**: make the data set more presentable to the user and store the work for later retrieval
 
-and rows at ...
-30 vols * 6 acts * 33 measures = 5,940 rows
+As a final step in the tidying process, the following cosmetic changes were made to the data.
 
+a. The integer code for the activities is swapped out for the actual activity name
+b. The working titles for the columns are replaced by more readable labels, specifically ...
+   - `volunteer`
+   - `study`
+   - `activity`
+   - `measure`
+   - `mean`
+   - `std.dev`
+c. The data table is sorted (arranged) using `volunteer`, `study`, `activity`, and `measure` in that order.
 
-#### 4. Clean Up Labels, Add Indexes
-clean up column labels a little
+The tidy data set (`data.s4`) takes up 213.8 KB of memory. The dimensions haven't changed since the last step.
+
+Finally the data table is saved to a CSV file named `dataTidy.csv`. Note that if this file already exists, it gets overwritten. The file takes up 431 KB on disk.
 
 
 #### Possible Tidying Steps Not Taken
@@ -208,4 +217,4 @@ First, the variable/feature names for the measurements were not cleaned up. Lack
 
 The names of the decriptive variables were updated from their working titles.
 
-
+Second, while the tidy data set is rather small, it may be helpful to add keys or indexes. Without knowing how the data set will be used, I cannot determine what keys/indexes to add.

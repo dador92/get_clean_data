@@ -10,13 +10,6 @@ library(stringr)
 dataRoot <- "./UCI\ HAR\ Dataset"
 
 
-
-
-
-
-
-
-
 ## loads and assembles the data for a given study group
 ## since the layout for both study groups (test and train) are the same,
 ## consolidtaing the load and assembly into a single funtion simplifies
