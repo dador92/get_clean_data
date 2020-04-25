@@ -2,12 +2,22 @@
 
 This is the end-of-course project for the JHU course on [Getting and Cleaning Data](https://www.coursera.org/learn/data-cleaning/) which is hosted on Coursera.
 
+<hr />
+## Notes to GRADERS:
+
+1. Please be mindful of the grading rubric's statement that "either a wide or long form of the data is acceptable." I opted for the *long* form as discussed below. I appreciate that you may have opted for the wide form.
+2. When tying a coding project into GitHub, it is customary to include the project files (e.g., *.Rproj and .gitignore). The images folder contains graphics referenced in my README.md. These are not extraneous items in my GitHub repository.
+
+This is a re-grade submission.
+
+<hr />
+
 ## Getting Started
 
 ### Background on Big Data in Sports Metrics
 
 One of the most exciting areas in all of data science right now is wearable computing. Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. For more information, see the artcile [Big Data, Activity Tracking, And The Battle For The
-world's Top Sports Brand](big_data_sports_article.pdf) written by David Stern.
+world's Top Sports Brand](https://www.itnews.com/article/2115126/big-data--activity-tracking--and-the-battle-for-the-world-s-top-sports-brand.html) written by David Stern.
 
 ### Prerequisites
 
