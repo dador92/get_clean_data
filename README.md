@@ -3,6 +3,7 @@
 This is the end-of-course project for the JHU course on [Getting and Cleaning Data](https://www.coursera.org/learn/data-cleaning/) which is hosted on Coursera.
 
 <hr />
+
 ## Notes to GRADERS:
 
 1. Please be mindful of the grading rubric's statement that "either a wide or long form of the data is acceptable." I opted for the *long* form as discussed below. I appreciate that you may have opted for the wide form.
